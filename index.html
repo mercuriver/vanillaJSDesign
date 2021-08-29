@@ -12,57 +12,41 @@
     <div id="app"></div>
   </body>
   <script>
-    class Publish {
-      #state;
-      #observers = new Set();
+    let currentObserver = null;
 
-      constructor(state) {
-        this.#state = state;
-        Object.keys(state).forEach((key) =>
-          Object.defineProperty(this, key, {
-            get: () => this.#state[key],
-          })
-        );
-      }
+    const observe = (fn) => {
+      currentObserver = fn;
+      fn();
+      currentObserver = null;
+    };
 
-      onUpdateState(newState) {
-        this.#state = { ...this.#state, ...newState };
-        this.notify();
-      }
+    const observable = (obj) => {
+      Object.keys(obj).forEach((key) => {
+        let _value = obj[key];
+        const observers = new Set();
 
-      addSubscriber(subscriber) {
-        this.#observers.add(subscriber);
-      }
+        Object.defineProperty(obj, key, {
+          get() {
+            if (currentObserver) observers.add(currentObserver);
+            return _value;
+          },
+          set(value) {
+            _value = value;
+            observers.forEach((fn) => fn());
+          },
+        });
+      });
+      return obj;
+    };
 
-      notify() {
-        this.#observers.forEach((fn) => fn());
-      }
-    }
+    const state = observable({ a: 10, b: 20 });
+    observe(() => console.log(`a = ${state.a}`));
+    observe(() => console.log(`b = ${state.b}`));
+    observe(() => console.log(`a + b = ${state.a + state.b}`));
+    observe(() => console.log(`a * b = ${state.a * state.b}`));
+    observe(() => console.log(`a - b = ${state.a - state.b}`));
 
-    class Subscriber {
-      #fn;
-      constructor(callback) {
-        this.#fn = callback;
-      }
-
-      subscribe(publisher) {
-        publisher.addSubscriber(this.#fn);
-      }
-    }
-
-    const state = new Publish({ a: 10, b: 20 });
-
-    const adder = new Subscriber(() =>
-      console.log(`a + b = ${state.a + state.b}`)
-    );
-    const multiplier = new Subscriber(() =>
-      console.log(`a * b = ${state.a * state.b}`)
-    );
-
-    adder.subscribe(state);
-    multiplier.subscribe(state);
-
-    state.notify();
-    state.onUpdateState({ a: 100, b: 200 });
+    state.a = 100;
+    state.b = 200;
   </script>
 </html>
