@@ -25,7 +25,7 @@ export class Component {
   template() {
     return '';
   }
-  redner() {
+  render() {
     this.$el.innerHTML = this.template();
   }
   setEvent() {}
