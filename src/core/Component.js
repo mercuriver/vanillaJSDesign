@@ -1,40 +1,33 @@
-class Component {
-  $target;
-  $props;
-  $state;
+import { observable, observe } from './observer.js';
 
-  constructor($target, $props) {
-    this.$target = $target;
-    this.$props = $props;
+export class Component {
+  state;
+  props;
+  $el;
+
+  constructor($el, props) {
+    this.$el = $el;
+    this.props = props;
     this.setup();
-    this.setEvent();
-    this.render();
   }
-  setup() {}
-  mounted() {}
+
+  setup() {
+    this.state = observable(this.initState());
+    observe(() => {
+      this.render();
+      this.setEvent();
+      this.mounted();
+    });
+  }
+  initState() {
+    return {};
+  }
   template() {
     return '';
   }
-  render() {
-    this.$target.innerHTML = this.template();
-    this.mounted();
+  redner() {
+    this.$el.innerHTML = this.template();
   }
   setEvent() {}
-  setState(newState) {
-    this.$state = { ...this.$state, ...newState };
-    this.render();
-  }
-  addEvent(eventType, selector, callback) {
-    const children = [...this.$target.querySelectorAll(selector)];
-
-    const isTarget = (target) =>
-      children.includes(target) || target.closest(selector);
-
-    this.$target.addEventListener(eventType, (event) => {
-      if (!isTarget(event.target)) return false;
-      callback(event);
-    });
-  }
+  mounted() {}
 }
-
-export default Component;
