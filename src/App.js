@@ -18,11 +18,11 @@ class App extends Component {
     const { $el } = this;
 
     $el.querySelector('#stateA').addEventListener('change', ({ target }) => {
-      store.state.a = Number(target.value);
+      store.commit('SET_A', Number(target.value));
     });
 
     $el.querySelector('#stateB').addEventListener('change', ({ target }) => {
-      store.state.b = Number(target.value);
+      store.commit('SET_B', Number(target.value));
     });
   }
 }
