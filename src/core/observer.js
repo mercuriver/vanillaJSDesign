@@ -1,7 +1,15 @@
 let currentObserver = null;
 
+const debounceFrame = (callback) => {
+  let currentCallback = -1;
+  return () => {
+    cancelAnimationFrame(currentCallback);
+    currentCallback = requestAnimationFrame(callback);
+  };
+};
+
 const observe = (fn) => {
-  currentObserver = fn;
+  currentObserver = debounceFrame(fn);
   fn();
   currentObserver = null;
 };
