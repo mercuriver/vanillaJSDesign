@@ -17,6 +17,9 @@ const observable = (obj) => {
         return _value;
       },
       set(value) {
+        if (_value === value) return;
+        // Todo: Set, Map, WeekSet, WekkMap은 JSON.stringify로 변환되지 않음.
+        if (JSON.stringify(_value) === JSON.stringify(value)) return;
         _value = value;
         observers.forEach((fn) => fn());
       },
