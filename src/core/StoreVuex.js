@@ -1,6 +1,6 @@
 import { observable } from './observer.js';
 
-export class Store {
+export class StoreVuex {
   #state;
   #mutations;
   #actions;

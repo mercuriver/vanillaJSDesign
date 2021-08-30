@@ -1,6 +1,6 @@
-import { Store } from './core/Store.js';
+import { StoreVuex } from './core/StoreVuex.js';
 
-export const store = new Store({
+export const storeVuex = new StoreVuex({
   state: { a: 10, b: 20 },
 
   mutations: {
