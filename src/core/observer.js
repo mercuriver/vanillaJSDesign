@@ -2,9 +2,6 @@ let currentObserver = null;
 
 const observe = (fn) => {
   currentObserver = fn;
-
-  console.log(fn);
-
   fn();
   currentObserver = null;
 };
@@ -16,7 +13,6 @@ const observable = (obj) => {
 
     Object.defineProperty(obj, key, {
       get() {
-        console.log('call get', key);
         if (currentObserver) observers.add(currentObserver);
         return _value;
       },
