@@ -24,12 +24,74 @@ function createElement(node) {
   return $el;
 }
 
-const state = [
+function updateAttributes(target, newProps, oldProps) {
+  for (const [attr, value] of Object.entries(newProps)) {
+    if (oldProps[attr] === newProps[attr]) continue;
+    target.setAttribute(attr, value);
+  }
+
+  for (const attr of Object.keys(oldProps)) {
+    if (newProps[attr] !== undefined) continue;
+    target.removeAttribute(attr);
+  }
+}
+
+function updateElement(parent, newNode, oldNode, index = 0) {
+  console.log({ parent, newNode, oldNode, index });
+
+  if (!newNode && oldNode) {
+    return parent.removeChild(parent.childNodes[index]);
+  }
+
+  if (newNode && !oldNode) {
+    return parent.appendChild(createElement(newNode));
+  }
+
+  if (typeof newNode === 'string' && typeof oldNode === 'string') {
+    if (newNode === oldNode) return;
+    return parent.replaceChild(
+      createElement(newNode),
+      parent.childNodes[index]
+    );
+  }
+
+  if (newNode.type !== oldNode.type) {
+    return parent.replaceChild(
+      createElement(newNode),
+      parent.childNodes[index]
+    );
+  }
+
+  updateAttributes(
+    parent.childNodes[index],
+    newNode.props || {},
+    oldNode.props || {}
+  );
+
+  const maxLength = Math.max(newNode.children.length, oldNode.children.length);
+
+  for (let i = 0; i < maxLength; i++) {
+    updateElement(
+      parent.childNodes[index],
+      newNode.children[i],
+      oldNode.children[i],
+      i
+    );
+  }
+}
+
+const oldState = [
   { id: 1, completed: false, content: 'todo list item 1' },
   { id: 2, completed: true, content: 'todo list item 2' },
 ];
 
-const virtualDom = (
+const newState = [
+  { id: 1, completed: true, content: 'todo list item 1 update' },
+  { id: 2, completed: true, content: 'todo list item 2' },
+  { id: 3, completed: false, content: 'todo list item 3' },
+];
+
+const render = (state) => (
   <div id="app">
     <ul>
       {state.map(({ completed, content }) => (
@@ -47,7 +109,13 @@ const virtualDom = (
   </div>
 );
 
-const realDom = createElement(virtualDom);
+const oldNode = render(oldState);
+const newNode = render(newState);
 
 const $root = document.body.querySelector('#root');
-$root.appendChild(realDom);
+
+updateElement($root, oldNode);
+setTimeout(() => updateElement($root, newNode, oldNode), 1000);
+
+// const $root = document.createElement('div');
+// document.body.appendChild(realDom);
