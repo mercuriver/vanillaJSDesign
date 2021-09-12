@@ -28,8 +28,6 @@ function updateElement(parent, newNode, oldNode) {
     return;
   }
 
-  console.log(newNode, oldNode);
-
   if (newNode.nodeName !== oldNode.nodeName) {
     const index = [...parent.childNodes].indexOf(oldNode);
     return oldNode.remove(), parent.appendChild(newNode, index);
